@@ -1,0 +1,4 @@
+id, find(groups=)
+ls asdsadsadsad, find(No such file or directory)
+cat /etc/passwd, find(root)
+sleep 3, delay(3)

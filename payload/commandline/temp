@@ -1,0 +1,2 @@
+ping localhost, find("icmp_seq=")
+ping -t 10 localhost, delay(10)

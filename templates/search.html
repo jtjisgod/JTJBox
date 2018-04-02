@@ -1,0 +1,47 @@
+<div id='block' class="row">
+    <div class="col-sm">
+        <h3>List of Target</h3>
+        <div>
+            <select size="10" name="lst_target" id="lst_target">
+                {% for k, v in page['pages'].items() %}
+                <option value="{{v}}">
+                    {{k}}
+                </option>
+
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="col-sm">
+        <h3>URL</h3>
+        <div>
+            <input type="text" name="name" id="ipt_name" placeholder="Site Name">
+        </div>
+        <div style="margin-top:10px">
+            <input type="text" name="url" id="ipt_url" placeholder="Start with http:// or https://">
+        </div>
+        <div>
+            <button class="btn btn-success" id="btn_search">GO</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    checked = "";
+    $("#lst_target > option").click(function() {
+        var target = $(this).attr("value")
+        if(checked == target) {
+            clicked($(this))
+            checked = "";
+            return;
+        }
+        setTimeout(function() {
+            checked = "";
+        }, 300);
+        checked = target;
+    });
+
+    function clicked(obj) {
+        location.href = "/detail/" + obj.attr("value");
+    }
+</script>

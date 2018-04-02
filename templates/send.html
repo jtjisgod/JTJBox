@@ -1,0 +1,149 @@
+<div id='block'>
+    <div id='blockTitle'>
+        <h1>{{ page['title'] }}</h1>
+        <div>{{ page['target']['url'] }}</div>
+    </div>
+    <br><br>
+    <div class="row">
+        <div class="col-sm">
+            <h3>Request Header</h3>
+
+            {% for k, v in page['header'].items() %}
+            <div style="margin-top:10px">
+                <div class="form-group">
+                    <label>{{'.'.join(k.split('.')[1:]).upper()}}</label>
+                    <input type="text" class="ipt_header" data="{{'.'.join(k.split('.')[1:]).lower()}}" value="{{v}}">
+                </div>
+            </div>
+            {% endfor %}
+            <!-- <div>
+                <button class="btn btn-success" id="btn_header">+</button>
+            </div> -->
+        </div>
+        <div class="col-sm params">
+            <h3>Params</h3>
+
+            {% for param in page['target']['param'] %}
+            <div style="margin-top:10px">
+                <div class="form-group">
+                    <label><b>[ {{page['target']['method']}} ]</b> {{param}}</label>
+                    <input type="text" data-method="{{page['target']['method'].upper()}}" data-name="{{param}}" class="form-control" placeholder="{{param}}">
+                </div>
+            </div>
+            {% endfor %}
+
+            {% for param in page['getParam'] %}
+            <div style="margin-top:10px">
+                <div class="form-group">
+                    <label><b>[ GET ]</b> {{param}}</label>
+                    <input type="text" data-method="GET" data-name="{{param}}" class="form-control" placeholder="{{param}}">
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="col-sm-12">
+            <br>
+            <button class="btn btn-success" id="btn_request">Request</button>
+        </div>
+    </div>
+    <br><br>
+    <div class="row" id="result">
+        <div class="col-sm">
+            <h3>Response Data</h3>
+            <table border="1px">
+                <tbody>
+                    <tr>
+                        <th>Time</th>
+                        <td class="res_time"></td>
+                    </tr>
+                    <tr>
+                        <th>Response Text</th>
+                        <td><pre class="res_txt"></pre></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    #block {
+        max-width : 1200px;
+    }
+    #blockTitle {
+        width : 100%;
+    }
+    #blockTitle > h1 {
+        text-align : center;
+        font-weight : bold;
+    }
+    #blockTitle > div {
+        text-align : center;
+        color : #666;
+    }
+    #btn_request    {
+        width : 100%;
+    }
+    #btn_header {
+        width : 100%;
+        background-color : rgb(44, 204, 92);
+    }
+    th, td {
+        padding : 20px;
+    }
+    #result {
+        display : none;
+    }
+</style>
+<script>
+    $(function() {
+        $("#btn_header").click(function() {
+
+        });
+        $("#btn_request").click(function() {
+            $("#loading").show();
+            var data;
+            var headers_ = []
+            var headers = $(".ipt_header");
+            for(i=0;i<headers.length;i++) {
+                headers_.push({
+                    key: headers.eq(i).attr("data"),
+                    value: headers.eq(i).val()
+                })
+            }
+            headers_.push()
+            var params_ = []
+            var params = $(".params input[type=text]");
+            for(i=0;i<params.length;i++) {
+                var method = params.eq(i).attr("data-method");
+                var name = params.eq(i).attr("data-name");
+                params_.push({
+                    method: method,
+                    name: name,
+                    value: params.eq(i).val()
+                })
+            }
+            data={
+                url : "{{ page['target']['url'] }}",
+                headers : headers_,
+                params: params_
+            }
+            data = JSON.stringify(data);
+            $.ajax({
+                url: "/update/send",
+                method: "POST",
+                data: "data=" + encodeURIComponent(data),
+                success: function(res) {
+                    $("#loading").hide();
+                    $("#result").show();
+                    var parsed = JSON.parse(res);
+                    $(".res_time").text(parsed.time);
+                    $(".res_txt").text(parsed.html);
+                    $('html, body').animate({
+                        scrollTop: $("#result").offset().top
+                    }, 500);
+                }
+            });
+        });
+    });
+</script>

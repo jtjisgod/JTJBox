@@ -1,0 +1,67 @@
+<div id='block' class="row">
+    <div id='blockTitle'><h1>{{ page['title'] }}</h1></div>
+    <div class="col-sm">
+        <h3>Attack Vectors</h3>
+        <div style="width:100%;overflow:auto;">
+            <table id="tbl_av">
+                <thead>
+                    <tr>
+                        <th>IDX</th>
+                        <th>METHOD</th>
+                        <th>URL</th>
+                        <th>PARAM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    $("#loading").show();
+    $(function() {
+        $.ajax({
+            url : "/update/detail/{{page['code']}}",
+            type : "get",
+            success : function(res) {
+                $("#loading").hide();
+                res = JSON.parse(res);
+                if(res.status == "success") {
+                    drawTable(res.result);
+                    return;
+                }
+                alert(res.message);
+            }
+        });
+    });
+    function drawTable(row) {
+        for(i=0;i<row.length;i++) {
+            data = "<tr data='" + i + "'>";
+            data += "<td>" + (i+1) + "</td>";
+            data += "<td>" + row[i].method + "</td>";
+            data += "<td><span>" + row[i].url + "</span></td>";
+            if(row[i].param) {
+                data += "<td>" + row[i]['param'].join(",") + "</td>";
+            } else {
+                data += "<td></td>";
+            }
+            data += "</tr>";
+            $("#tbl_av > tbody").append(data);
+        }
+        $("#tbl_av > tbody > tr").click(function() {
+            var data = $(this).attr("data");
+            location.href = "/send/{{page['code']}}/" + data;
+        });
+    }
+</script>
+
+<style>
+    #blockTitle {
+        width : 100%;
+    }
+    #blockTitle > h1 {
+        text-align : center;
+        font-weight : bold;
+    }
+</style>
